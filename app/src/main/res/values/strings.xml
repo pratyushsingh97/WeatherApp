@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Daily Overview</string>
+    <string name="addressTextView">Austin, TX</string>
+    <string name="currentTempLabel">73</string>
+    <string name="lowTempLabel">50</string>
+    <string name="highTempLabel">80</string>
+    <string name="progressLabel">Getting that weather for ya!</string>
+    <string name="nextHourLabel">Next Hour Conditions</string>
+    <string name="hour1">First Hour Temperature</string>
+    <string name="twoDays">The average temperature for the next two days</string>
+    <string name="title_activity_extra_weather_info">Forecast</string>
+    <string name="followingWeek">Weather for the next week</string>
+    <string name="search_title"> Search for Weather</string>
+    <string name="search_hint">Jan 1 1970</string>
+</resources>
