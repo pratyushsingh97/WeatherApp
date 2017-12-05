@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
@@ -46,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     ProgressBar progressBar;
     SwipeRefreshLayout swipeRefresh;
     TextView city, lowerTempLabel, currentTempLabel, upperTempLabel, nextHourLabel, firstHourLabel,
-            secondHourLabel, thirdHourLabel, fourthHourLabel, fifthHourLabel, avgTemp;
+            secondHourLabel, thirdHourLabel, fourthHourLabel, fifthHourLabel, avgTemp, wph;
 
 
     @Override
@@ -67,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
         fourthHourLabel = findViewById(R.id.fourthHour);
         fifthHourLabel = findViewById(R.id.fifthHour);
         avgTemp = findViewById(R.id.twoDaysLabel);
+        wph = findViewById(R.id.windSpeed);
 
         //make the labels invisible
         city.setVisibility(View.INVISIBLE);
@@ -80,6 +82,8 @@ public class MainActivity extends AppCompatActivity {
         fourthHourLabel.setVisibility(View.INVISIBLE);
         fifthHourLabel.setVisibility(View.INVISIBLE);
         avgTemp.setVisibility(View.INVISIBLE);
+        wph.setVisibility(View.INVISIBLE);
+
 
         //click on current temp to get more info
         currentTempLabel.setOnClickListener(new View.OnClickListener() {
@@ -89,7 +93,6 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("DAILY_DATA", dailyData.toString());
                 intent.putExtra("AVG_DATA", tempAverage);
                 startActivity(intent);
-                //Log.d("click", "Click worked");
             }
         });
 
@@ -168,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
     private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
-            new RetrieveWeather(query, true).execute();
+            new RetrieveWeather(query).execute();
 
         }
 
@@ -201,9 +204,9 @@ public class MainActivity extends AppCompatActivity {
         String currentTemperature = "";
         String lowerTemperature = "";
         String upperTemperature = "";
+        String wind_precip_humidity = "";
         String url = getURL + API_KEY + '/' + LATITUDE + ',' + LONGITUDE;
         boolean disableFunctions = false;
-        //isPast = false;
 
         String [] almostMessages = {"Getting weather related updates", "Just a couple more seconds",
         "Extracting weather information from the cloud (what is the cloud?)", "Getting info about clouds" +
@@ -213,11 +216,12 @@ public class MainActivity extends AppCompatActivity {
         String [] doneMessages = {"The weather is served!", "Weather, how abou' dah?", "Just about done!"};
 
         public RetrieveWeather() {
+            disableFunctions = false;
             //regular execution
 
         }
         @RequiresApi(api = Build.VERSION_CODES.O)
-        public RetrieveWeather(String query, boolean disableFx) {
+        public RetrieveWeather(String query) {
             isPast = true;
             try {
 
@@ -226,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
                 long epoch = date.getTime()/1000;
                 Log.e("EPOCH", "" + epoch);
                 url = getURL + API_KEY + '/' + LATITUDE + ',' + LONGITUDE + ',' + epoch;
-                disableFunctions = disableFx;
+                disableFunctions = true;
 
 
             }
@@ -264,11 +268,21 @@ public class MainActivity extends AppCompatActivity {
                     //let's get the data from the JSON
                     JSONObject jsonObject = new JSONObject(jsonResponse.toString());
                     currentTemperature = jsonObject.getJSONObject("currently").getString("temperature");
+                    wind_precip_humidity = "Windspeed: " +
+                            jsonObject.getJSONObject("currently").getString("windSpeed") +
+                            "\nChance of rain: " +
+                            jsonObject.getJSONObject("currently").getString("precipProbability")
+                            + "%\nHumidity: " +
+                            jsonObject.getJSONObject("currently").getString("humidity");
+
+
 
                     dailyData = jsonObject.getJSONObject("daily");//.getJSONArray("data");
 
-                    lowerTemperature = dailyData.getJSONArray("data").getJSONObject(0).get("temperatureLow").toString();
-                    upperTemperature = dailyData.getJSONArray("data").getJSONObject(0).get("temperatureHigh").toString();
+                    lowerTemperature = dailyData.getJSONArray("data").getJSONObject(0)
+                            .get("temperatureLow").toString();
+                    upperTemperature = dailyData.getJSONArray("data").getJSONObject(0)
+                            .get("temperatureHigh").toString();
 
                     JSONArray hourlyData = jsonObject.getJSONObject("hourly").getJSONArray("data");
 
@@ -328,18 +342,30 @@ public class MainActivity extends AppCompatActivity {
                 city.setVisibility(View.VISIBLE);
                 city.setTextSize(60);
 
-                //if(!disableFunctions) {
-                    currentTempLabel.setText(currentTemperature);
-                    currentTempLabel.setVisibility(View.VISIBLE);
-                    currentTempLabel.setTextSize(50);
-                    currentTempLabel.setEnabled(false);
+                currentTempLabel.setText(currentTemperature);
+                currentTempLabel.setVisibility(View.VISIBLE);
+                currentTempLabel.setTextSize(50);
 
-                    nextHourLabel.setVisibility(View.VISIBLE);
-                    nextHourLabel.setTextSize(22);
 
+                nextHourLabel.setVisibility(View.VISIBLE);
+                nextHourLabel.setTextSize(22);
+
+                wph.setText(wind_precip_humidity);
+                wph.setVisibility(View.VISIBLE);
+                wph.setTextSize(16);
+                wph.setTextColor(Color.GRAY);
+
+                if(!disableFunctions) {
                     avgTemp.setVisibility(View.VISIBLE);
                     avgTemp.setText("The average temp for the next 48 hours: " + tempAverage);
-               // }
+                    currentTempLabel.setTextColor(Color.BLACK);
+
+                } else {
+                    avgTemp.setVisibility(View.INVISIBLE);
+                    currentTempLabel.setTextColor(Color.parseColor("#EF5350"));
+                    //currentTempLabel.setTextColor();
+                }
+
 
                 swipeRefresh.setRefreshing(false);
 

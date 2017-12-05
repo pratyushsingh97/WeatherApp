@@ -40,8 +40,8 @@ public class ExtraWeather extends AppCompatActivity {
 
             for(int i = 1; i < 8; i++) {
                 String low_temperature = dailyArray.getJSONObject(i)
-                        .get("temperatureHigh").toString();
-                String high_temperature = dailyArray.getJSONObject(i).get("temperatureLow").toString();
+                        .get("temperatureLow").toString();
+                String high_temperature = dailyArray.getJSONObject(i).get("temperatureHigh").toString();
                 time = dailyArray.getJSONObject(i).get("time").toString();
                 timestamp = Long.parseLong(time);
                 String day = formattedDate(timestamp * 1000);

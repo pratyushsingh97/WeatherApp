@@ -12,4 +12,5 @@
     <string name="followingWeek">Weather for the next week</string>
     <string name="search_title"> Search for Weather</string>
     <string name="search_hint">Jan 1 1970</string>
+    <string name="windSpeed">Wind speed, precipitation, and humidity</string>
 </resources>
