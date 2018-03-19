@@ -38,15 +38,15 @@ import org.json.*;
 
 public class MainActivity extends AppCompatActivity {
     private static final int TWO_DAYS  = 48;
-    double [] fiveHourTemp = new double[5];
-    double tempAverage = 0;
-    boolean isSet = false;
-    boolean isPast = false;
-    JSONObject dailyData;
+    private double [] fiveHourTemp = new double[5];
+    private double tempAverage = 0;
+    private boolean isSet = false;
+    private boolean isPast = false;
+    private JSONObject dailyData;
 
-    ProgressBar progressBar;
-    SwipeRefreshLayout swipeRefresh;
-    TextView city, lowerTempLabel, currentTempLabel, upperTempLabel, nextHourLabel, firstHourLabel,
+    private ProgressBar progressBar;
+    private SwipeRefreshLayout swipeRefresh;
+    private TextView city, lowerTempLabel, currentTempLabel, upperTempLabel, nextHourLabel, firstHourLabel,
             secondHourLabel, thirdHourLabel, fourthHourLabel, fifthHourLabel, avgTemp, wph;
 
 
@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         avgTemp = findViewById(R.id.twoDaysLabel);
         wph = findViewById(R.id.windSpeed);
 
-        //make the labels invisible
+        //make the labels invisible on launch and until information is available
         city.setVisibility(View.INVISIBLE);
         lowerTempLabel.setVisibility(View.INVISIBLE);
         currentTempLabel.setVisibility(View.INVISIBLE);
@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         wph.setVisibility(View.INVISIBLE);
 
 
-        //click on current temp to get more info
+        //click on current temp to get more info (takes you to a new screen)
         currentTempLabel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        //click on nextHourLabel to get the
+        //click on nextHourLabel to get the hour temperature for the next 5 hours
         nextHourLabel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -134,8 +134,8 @@ public class MainActivity extends AppCompatActivity {
                 Double fifth = fiveHourTemp[4];
                 fifthHourLabel.setText(sdf.format(cal.getTime()) + ": " + fifth.toString());
 
+                //make the labels visible or invisible
                 isSet = !isSet;
-
                 if(isSet) {
                     firstHourLabel.setVisibility(View.VISIBLE);
                     secondHourLabel.setVisibility(View.VISIBLE);
@@ -196,7 +196,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     class RetrieveWeather extends AsyncTask<Void, String, String> {
-
         private final String getURL = "https://api.darksky.net/forecast/";
         private final double LATITUDE = 30.2672;
         private final double LONGITUDE = -97.7431;
@@ -304,12 +303,10 @@ public class MainActivity extends AppCompatActivity {
 
                     return jsonResponse.toString();
 
-                }
-                finally {
+                } finally {
                     urlConnection.disconnect();
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Log.e("ERROR", e.getMessage(), e);
                 return null;
             }
@@ -320,8 +317,7 @@ public class MainActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.INVISIBLE);
                 response = "There was an error in retrieving weather information";
                 Toast.makeText(MainActivity.this, response, Toast.LENGTH_LONG).show();
-            }
-            else {
+            } else {
                 //show "done messages"
                 int range = doneMessages.length;
                 int rIndex = (int) (Math.random() * range);
